@@ -1,25 +1,120 @@
-Dynamic Inventory  is bacially is a concept in which we fatch the info of our server dynamically by writing a yaml language script . 
-first lounch 3 instance one is controle node or other 2 are the targate node  then login to the controle node and install the ansible-core in the controle node and create a invantory .yml file 
-befor login the create the aws cradincal's in the  instace also . 
-  
-  in the fiel write the yaml code for fatch the running server info in the cloud . 
-      inside the file 
-is show in the cose space 
-  
+In this concept the dynamic inventory let's understand by the help of a example in the AWS .
+Let's lounch three instance in the AWS one is controle node and second and third are  the targate node . 
+
+In this concept the dynamic inventory need the key is create at the time of the instance lounch .
+
+the command for this key transfer from the window operating system to the ec2 linux operating system two way by GUI or CLI . 
+
+befor it all copy the     kegggg.pem        this file in the         Myfile.txt this file 
+
+the command for the cli is :-
+
+scp -i "C:\Users\Hitesh\Downloads\kegggg.pem" "C:\Users\Hitesh\Desktop\Myfile.txt" ec2-user@52.23.160.69:/home/ec2-user/file
+heare the scp is thr protoclall name secquare copy protocall having port no is 22 like ssh it is basically the ssh service part  then the "C:\Users\Hitesh\Downloads\kegggg.pem"
+this is the  location of the file in the window operating system and  this is the actual file whic go in the ec2 user instance "C:\Users\Hitesh\Desktop\Myfile.txt"
+then after all is the user name or the ip and the path where the file is store in the instance 
+
+then after the file copy ot transfer sucessfully then change the mode of the file is a txt file and conver to the .pem  file for th key authontaction 
+
+the command for this :-
+ chmod 400 file location   
+
+than after this u will able to do ssh to the TN by using the key file in this case is name kegggg.pem
+
+let's perform the dynamic inventory :-
+
+create a .yaml file for the dynamic inventry by using a command # vi inventory.yaml
+
+in the file add in the json formate a script it fatch the server ip and other thing's based on requirnment 
+
+plugin: amazon.aws.aws_ec2
+regions:
+  - us-east-1
+filters:
+  instance-state-name: running
+hostnames:
+  - dns-name
+compose:
+  ansible_host: public-ip-address
+keyed_groups:
+  - key: tags.Name
+    prefix: tag
+strict: false        # to disable host key checking if you want (optional)
+ansible_user: ec2-user
+ansible_ssh_private_key_file: /root/kegggg.pem
 
 
-      then install the require package for the python 
-      pip install boto boto3
-after it run this command to show the list of all the server in the perticular region 
+then after the file create install the ansible by using the command 
+# yum install -y ansible-core  
+also install the python3 pip command for install the software or the package's /
+# yum install -y python3 pip 
 
-      ansible-inventory -i aws_ec2.yaml --list
+then install the python lybrarie's 
+# pip install boto3 botocore 
 
-      then ansible ping to all the instance server if they are running 
-      ansible -i aws_ec2.yaml all -m ping --private-key mykey.pem -u ec2-user
+then configer the aws cil first download it and then fill the cradianceal's your acces key  security key and all 
 
-then create a play book and the play book run by the command 
+ yum install awscli -y
+aws configure
+ aws s3 ls  // this command show any kind of arrer that mean's somthing wrong . 
 
-      ansible-playbook -i aws_ec2.yaml playbook.yml
+then after the command is to very file eveything is working properlly or not the dynamic inventory specially :-
+
+#ansible-inventory -i inventory.yaml --list  // if this show any kind of error it mean's not working it it show the instance all about he server running 
+in the perticular region menan's good 
+
+it it show the error need to update the ansible-core 
+# pip install --upgrade ansible-core
+ansible --version
+ansible-inventory -i /root/aws_ec2.yaml --list  
+
+it is not working that mean's the module or the package not avilable /////////////amazon.aws
+ansible-galaxy collection install amazon.aws
+
+
+after it check working or not 
+
+ping to all the instance in the server .
+ansible -i inventory.yaml all -m ping --private-key mykey.pem -u ec2-user
+
+also use this  
+ansible-inventory -i inventory.yaml --list
+this ping easly 
+
+
+then create a play book :- 
+vi install_httpd.yaml
+
+
+and run it :-------
+ansible-playbook -i aws_ec2.yaml install_httpd.yaml -u ec2-user --private-key=/root/kegggg.pem
+
+for the verbose mode :-
+
+ansible-playbook -i aws_ec2.yaml install_httpd.yaml -u ec2-user --private-key=/root/kegggg.pem -v
+
+optional
+
+ssh -i /root/kegggg.pem ec2-user@44.206.241.240
+
+
+in the play book :-
+---
+- name: Install httpd on all EC2 instances from dynamic inventory
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install httpd package
+      package:
+        name: vim
+        state: present
+
+
+
+
+
+
+
 
 
 
