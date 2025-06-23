@@ -1,0 +1,33 @@
+Dynamic Inventory  is bacially is a concept in which we fatch the info of our server dynamically by writing a yaml language script . 
+first lounch 3 instance one is controle node or other 2 are the targate node  then login to the controle node and install the ansible-core in the controle node and create a invantory .yml file 
+befor login the create the aws cradincal's in the  instace also . 
+  
+  in the fiel write the yaml code for fatch the running server info in the cloud . 
+      inside the file 
+is show in the cose space 
+  
+
+
+      then install the require package for the python 
+      pip install boto boto3
+after it run this command to show the list of all the server in the perticular region 
+
+      ansible-inventory -i aws_ec2.yaml --list
+
+      then ansible ping to all the instance server if they are running 
+      ansible -i aws_ec2.yaml all -m ping --private-key mykey.pem -u ec2-user
+
+then create a play book and the play book run by the command 
+
+      ansible-playbook -i aws_ec2.yaml playbook.yml
+
+
+
+
+
+
+
+
+
+
+      
